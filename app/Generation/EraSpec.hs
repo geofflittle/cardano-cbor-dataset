@@ -8,11 +8,13 @@ import Cardano.Crypto.VRF (VerKeyVRF)
 import Cardano.Ledger.Address (DirectDeposits)
 import Cardano.Ledger.Allegra.Scripts (Timelock)
 import Cardano.Ledger.Allegra.TxAuxData (AllegraTxAuxData)
+import Cardano.Ledger.Alonzo (AlonzoEra)
 import Cardano.Ledger.Alonzo.Scripts (AlonzoEraScript (PlutusPurpose), AsIx, CostModels)
 import Cardano.Ledger.Alonzo.TxAuxData (AlonzoTxAuxData)
 import Cardano.Ledger.Alonzo.TxBody (ScriptIntegrityHash)
 import Cardano.Ledger.Alonzo.TxOut (AlonzoTxOut)
 import Cardano.Ledger.Alonzo.TxWits (Redeemers)
+import Cardano.Ledger.Babbage (BabbageEra)
 import Cardano.Ledger.Babbage.TxOut (BabbageTxOut)
 import Cardano.Ledger.BaseTypes
 import Cardano.Ledger.Binary
@@ -69,7 +71,9 @@ data EraSpec = EraSpec
 
 -- | Supported Eras
 data Era
-  = Conway
+  = Alonzo
+  | Babbage
+  | Conway
   | Dijkstra
   deriving (Show, Eq, Ord, Enum, Bounded)
 
@@ -86,9 +90,25 @@ instance FromJSON Era where
 
 eraSpecs :: [EraSpec]
 eraSpecs =
-  [ EraSpec Conway (eraProtVerHigh @ConwayEra) conwayRules,
+  [ EraSpec Alonzo (eraProtVerHigh @AlonzoEra) alonzoRules,
+    EraSpec Babbage (eraProtVerHigh @BabbageEra) babbageRules,
+    EraSpec Conway (eraProtVerHigh @ConwayEra) conwayRules,
     EraSpec Dijkstra (eraProtVerHigh @DijkstraEra) dijkstraRules
   ]
+
+-- | All the Alonzo rules
+alonzoRules :: [GenerationRule]
+alonzoRules =
+  let version = eraProtVerHigh @AlonzoEra
+   in [ mkRule @(PParamsUpdate AlonzoEra) version "protocol_param_update"
+      ]
+
+-- | All the Babbage rules
+babbageRules :: [GenerationRule]
+babbageRules =
+  let version = eraProtVerHigh @BabbageEra
+   in [ mkRule @(PParamsUpdate BabbageEra) version "protocol_param_update"
+      ]
 
 -- | All the Conway rules
 conwayRules :: [GenerationRule]

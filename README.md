@@ -1,6 +1,7 @@
 # Cardano CBOR dataset
 
 This project generates deterministic CBOR corpora for Conway and Dijkstra eras from the Cardano Ledger Huddle/CDDL generator.
+The Alonzo and Babbage corpora hold only the protocol parameter update, which carries a protocol version in those eras.
 This test data can be used by any Cardano node implementation to check its conformance with respect to the decoding of on-chain data.
 
 The two intended users for this project are:
@@ -72,7 +73,7 @@ The options for the `generate` command are
 
 | Option                   | Description                                                                          |
 |--------------------------|--------------------------------------------------------------------------------------|
-| `--era ERA`              | `conway` or `dijkstra`.                                                              |
+| `--era ERA`              | `alonzo`, `babbage`, `conway` or `dijkstra`.                                         |
 | `--config FILE`          | A configuration file, see [Generation configuration](#generation-configuration).     |
 | `--only RULE`            | Only generate data for this rule. Repeat the option for several rules.               |
 | `--no-verify`            | Do not verify the new corpus before it replaces the previous one.                    |
@@ -325,7 +326,7 @@ All fields are required:
 | Field                   | Content                                                                               |
 | ----------------------- | ------------------------------------------------------------------------------------- |
 | `version`               | The version of this format: the string `"2"`. A change of the format changes it.      |
-| `era`                   | The era of the dataset that was tested, in lower case: `conway` or `dijkstra`.        |
+| `era`                   | The era of the dataset that was tested, in lower case, for example `conway`.          |
 | `generated_at`          | When the report was made, in milliseconds since the Unix epoch.                       |
 | `protocol_version`      | The protocol version that the node used to decode, as `<major>.<minor>`.              |
 | `dataset_commit`        | The full hash of the commit of this repository that holds the samples.                |

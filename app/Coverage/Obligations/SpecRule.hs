@@ -1,6 +1,8 @@
 module Coverage.Obligations.SpecRule where
 
 import Base.Paths (abort)
+import Cardano.Ledger.Alonzo.HuddleSpec (alonzoCDDL)
+import Cardano.Ledger.Babbage.HuddleSpec (babbageCDDL)
 import Cardano.Ledger.Conway.HuddleSpec (conwayCDDL)
 import Cardano.Ledger.Dijkstra.HuddleSpec (dijkstraCDDL)
 import Codec.CBOR.Cuddle.CBOR.Validator (validateCBOR)
@@ -383,6 +385,8 @@ eraRoot era = do
 -- Measuring a different tree from the one that generates the data would be measuring the wrong thing.
 eraHuddle :: Text -> Either Text Cuddle.Huddle
 eraHuddle = \case
+  "alonzo" -> Right alonzoCDDL
+  "babbage" -> Right babbageCDDL
   "conway" -> Right conwayCDDL
   "dijkstra" -> Right dijkstraCDDL
   other -> Left $ "no Huddle specification for era '" <> other <> "'"
