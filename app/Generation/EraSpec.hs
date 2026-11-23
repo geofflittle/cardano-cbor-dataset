@@ -3,7 +3,9 @@ module Generation.EraSpec where
 import Cardano.Base.IP (IPv4, IPv6)
 import Cardano.Crypto.DSIGN (SignedDSIGN)
 import Cardano.Crypto.KES (VerKeyKES)
+import Cardano.Crypto.Leios (LeiosCert, LeiosSignature)
 import Cardano.Crypto.VRF (VerKeyVRF)
+import Cardano.Ledger.Address (DirectDeposits)
 import Cardano.Ledger.Allegra.Scripts (Timelock)
 import Cardano.Ledger.Allegra.TxAuxData (AllegraTxAuxData)
 import Cardano.Ledger.Alonzo.Scripts (AlonzoEraScript (PlutusPurpose), AsIx, CostModels)
@@ -14,16 +16,21 @@ import Cardano.Ledger.Alonzo.TxWits (Redeemers)
 import Cardano.Ledger.Babbage.TxOut (BabbageTxOut)
 import Cardano.Ledger.BaseTypes
 import Cardano.Ledger.Binary
-import Cardano.Ledger.Block (Block)
+import Cardano.Ledger.Block (Block, BlockHeaderVersionInfo, EbReferencesAnnouncement)
 import Cardano.Ledger.Coin (Coin)
 import Cardano.Ledger.Conway (ConwayEra)
 import Cardano.Ledger.Conway.Governance
 import Cardano.Ledger.Conway.PParams (DRepVotingThresholds, PoolVotingThresholds)
 import Cardano.Ledger.Core hiding (Era)
+import Cardano.Ledger.Core qualified as Core (Era)
 import Cardano.Ledger.Credential (Credential)
 import Cardano.Ledger.DRep (DRep)
 import Cardano.Ledger.Dijkstra (DijkstraEra)
+import Cardano.Ledger.Dijkstra.Block.Endorser (EbReferences)
+import Cardano.Ledger.Dijkstra.BlockBody (PerasCert)
 import Cardano.Ledger.Dijkstra.Scripts (AccountBalanceInterval, AccountBalanceIntervals)
+import Cardano.Ledger.Dijkstra.Tx (Tx (MkDijkstraTx), decodeDijkstraTopTxInBlock, toCBORForBlockInclusion)
+import Cardano.Ledger.Dijkstra.TxBody (TxBody (dtbRequiredTopLevelGuards, dtbSubTransactions), decodeGuards)
 import Cardano.Ledger.Keys
 import Cardano.Ledger.Mary.Value (AssetName, MaryValue (..), MultiAsset, PolicyID)
 import Cardano.Ledger.Metadata (Metadatum)
@@ -31,12 +38,13 @@ import Cardano.Ledger.Plutus.Data (BinaryData, Data, Datum, getPlutusData)
 import Cardano.Ledger.Plutus.ExUnits (ExUnits, Prices)
 import Cardano.Ledger.Plutus.Language (Language, PlutusBinary)
 import Cardano.Ledger.Shelley.TxAuxData (ShelleyTxAuxData)
-import Cardano.Ledger.State (PoolMetadata, StakePoolRelay)
+import Cardano.Ledger.State (BlsKey, PoolMetadata, StakePoolRelay)
 import Cardano.Ledger.TxIn (TxId, TxIn)
 import Cardano.Protocol.Crypto (KES, StandardCrypto, VRF)
 import Cardano.Protocol.Leios.BlockHeader qualified as Leios
 import Cardano.Protocol.Praos.BlockHeader (Header, HeaderBody)
 import Cardano.Protocol.TPraos.OCert (KESPeriod, OCert)
+import Cardano.Slotting.Slot (SlotInterval)
 import Coverage.Obligations.SpecRule (HuddleSpec, eraRoot)
 import Data.Aeson (FromJSON (..), ToJSON (..), withText)
 import Data.ByteString qualified as BS
@@ -196,15 +204,27 @@ dijkstraRules :: [GenerationRule]
 dijkstraRules =
   let version = eraProtVerHigh @DijkstraEra
    in [ -- A Dijkstra block carries the Leios header, which adds the Leios certificate flag and the endorser block
-        -- announcement to the Praos header body.
+        -- references announcement to the Praos header body.
         mkAnnotatorRule @(Block (Leios.Header StandardCrypto) DijkstraEra) version "block",
         mkByteExactAnnotatorRule @(Leios.Header StandardCrypto) version "header",
-        mkRule @(Leios.HeaderBody StandardCrypto) version "header_body",
-        mkRule @Leios.EbAnnouncement version "eb_announcement",
+        mkByteExactAnnotatorRule @(Leios.HeaderBody StandardCrypto) version "header_body",
+        mkRule @BlockHeaderVersionInfo version "header_version_info",
+        mkRule @EbReferencesAnnouncement version "eb_references_announcement",
+        mkByteExactRule @EbReferences version "eb_references",
+        mkRule @(Hash HASH EraIndependentTx, Word32) version "eb_reference",
         mkRule @(BlockBody DijkstraEra) version "block_body",
-        mkRule @(Tx TopTx DijkstraEra) version "transaction",
+        mkRule @LeiosCert version "leios_certificate",
+        mkRule @LeiosSignature version "leios_signature",
+        mkRule @PerasCert version "peras_certificate",
+        mkAnnotatorRule @DijkstraBlockTransaction version "block_transaction",
+        mkAnnotatorRule @(Tx TopTx DijkstraEra) version "mempool_transaction",
         mkByteExactRule @(TxBody TopTx DijkstraEra) version "transaction_body",
         mkRule @(TxBody SubTx DijkstraEra) version "sub_transaction_body",
+        mkAnnotatorRule @(Tx SubTx DijkstraEra) version "sub_transaction",
+        mkSubTransactionsRule version "sub_transactions",
+        mkRequiredTopLevelGuardsRule version "required_top_level_guards",
+        mkGuardsRule version "guards",
+        mkRule @DirectDeposits version "direct_deposits",
         mkRule @TxIn version "transaction_input",
         mkByteExactRule @(TxWits DijkstraEra) version "transaction_witness_set",
         mkRule @(TxOut DijkstraEra) version "transaction_output",
@@ -229,6 +249,9 @@ dijkstraRules =
         mkRule @CostModels version "cost_models",
         mkRule @(AccountBalanceInterval DijkstraEra) version "account_balance_interval",
         mkRule @(AccountBalanceIntervals DijkstraEra) version "account_balance_intervals",
+        mkRule @(AccountBalanceIntervals DijkstraEra) version "starting_account_balance_intervals",
+        mkRule @SlotInterval version "slot_interval",
+        mkRule @BlsKey version "bls_key",
         mkRule @Voter version "voter",
         mkRule @Metadatum version "metadatum",
         mkRule @DRepVotingThresholds version "drep_voting_thresholds",
@@ -300,6 +323,7 @@ dijkstraRules =
         mkRule @PlutusBinary version "plutus_v1_script",
         mkRule @PlutusBinary version "plutus_v2_script",
         mkRule @PlutusBinary version "plutus_v3_script",
+        mkRule @PlutusBinary version "plutus_v4_script",
         mkRule @(BinaryData DijkstraEra) version "data",
         mkRule @(ShelleyTxAuxData DijkstraEra) version "metadata",
         mkRule @(AlonzoTxAuxData DijkstraEra) version "auxiliary_data_map",
@@ -371,14 +395,14 @@ instance EncCBOR ConwaySingleRedeemer where
 --   The plutus data decoder refuses a bignum of more than 64 bytes, as @bounded_bytes@ states.
 newtype PlutusInteger era = PlutusInteger (Data era)
 
-instance (Typeable era) => DecCBOR (PlutusInteger era) where
+instance (Core.Era era) => DecCBOR (PlutusInteger era) where
   decCBOR = do
     plutusData <- decCBOR
     case getPlutusData plutusData of
       PV1.I _ -> pure (PlutusInteger plutusData)
       _ -> fail "expected an integer"
 
-instance (Typeable era) => EncCBOR (PlutusInteger era) where
+instance (Core.Era era) => EncCBOR (PlutusInteger era) where
   encCBOR (PlutusInteger plutusData) = encCBOR plutusData
 
 -- | The ledger has no type for bytes of limited size on their own: it reads them inside plutus data.
@@ -386,14 +410,14 @@ instance (Typeable era) => EncCBOR (PlutusInteger era) where
 --   indefinite-length string of any size, if each chunk has at most 64 bytes.
 newtype PlutusBytes era = PlutusBytes (Data era)
 
-instance (Typeable era) => DecCBOR (PlutusBytes era) where
+instance (Core.Era era) => DecCBOR (PlutusBytes era) where
   decCBOR = do
     plutusData <- decCBOR
     case getPlutusData plutusData of
       PV1.B _ -> pure (PlutusBytes plutusData)
       _ -> fail "expected bytes"
 
-instance (Typeable era) => EncCBOR (PlutusBytes era) where
+instance (Core.Era era) => EncCBOR (PlutusBytes era) where
   encCBOR (PlutusBytes plutusData) = encCBOR plutusData
 
 -- | The rule for a multi-asset value whose amounts are positive.
@@ -407,3 +431,43 @@ mkPositiveMultiAssetRule version name = makeRule name decodeMultiAsset (serializ
     decodeMultiAsset bytes = do
       MaryValue _ multiAsset <- decodeAs @MaryValue version (BS.pack [0x82, 0x00] <> bytes)
       pure multiAsset
+
+-- | A Dijkstra transaction in the form a block body holds it, with the validity flag as its fourth item.
+newtype DijkstraBlockTransaction = DijkstraBlockTransaction (Tx TopTx DijkstraEra)
+
+instance DecCBOR (Annotator DijkstraBlockTransaction) where
+  decCBOR = fmap (DijkstraBlockTransaction . MkDijkstraTx) <$> decodeDijkstraTopTxInBlock
+
+instance EncCBOR DijkstraBlockTransaction where
+  encCBOR (DijkstraBlockTransaction tx) = toCBORForBlockInclusion tx
+
+-- | The rule for the guards of a transaction body, read by the decoder the ledger uses for field 14.
+mkGuardsRule :: Version -> RuleName -> GenerationRule
+mkGuardsRule version name =
+  makeRule name (first show . decodeFullDecoder' version (unRuleName name) decodeGuards) (serialize' version) normalized
+
+-- | The rule for the sub transactions of a transaction, which the ledger decodes only as field 23 of a transaction body.
+--
+--   So the sample becomes the value of field 23 in the smallest transaction body, and the body decoder reads it.
+mkSubTransactionsRule :: Version -> RuleName -> GenerationRule
+mkSubTransactionsRule version name = makeRule name decodeSubTransactions (serialize' version) normalized
+  where
+    decodeSubTransactions bytes =
+      dtbSubTransactions <$> decodeThroughAnnotator @(TxBody TopTx DijkstraEra) version name (smallestTxBodyWith [0x17] bytes)
+
+-- | The rule for the required top level guards, which the ledger decodes only as field 24 of a transaction body.
+--
+--   So the sample becomes the value of field 24 in the smallest transaction body, and the body decoder reads it. The
+--   ledger encodes the field with this encoder inside the body encoder, which writes an absent datum as null.
+mkRequiredTopLevelGuardsRule :: Version -> RuleName -> GenerationRule
+mkRequiredTopLevelGuardsRule version name = makeRule name decodeGuardsField encodeGuardsField normalized
+  where
+    decodeGuardsField bytes =
+      dtbRequiredTopLevelGuards
+        <$> decodeThroughAnnotator @(TxBody TopTx DijkstraEra) version name (smallestTxBodyWith [0x18, 0x18] bytes)
+    encodeGuardsField :: Map (Credential Guard) (StrictMaybe (Data DijkstraEra)) -> BS.ByteString
+    encodeGuardsField = serialize' version . encodeMap encCBOR (encodeNullStrictMaybe encCBOR)
+
+-- | A transaction body with no inputs, no outputs, a zero fee, and the sample as the value of the given key.
+smallestTxBodyWith :: [Word8] -> BS.ByteString -> BS.ByteString
+smallestTxBodyWith key sample = BS.pack ([0xa4, 0x00, 0x80, 0x01, 0x80, 0x02, 0x00] <> key) <> sample

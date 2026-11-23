@@ -1,12 +1,12 @@
 # Cardano CBOR Decoder/Encoder Conformance Report
 
-**Corpus:** dataset / dijkstra  
+**Corpus:** output / dijkstra  
 **Era:** dijkstra  
-**Dataset commit:** `7543411152a41b98053eb32fdad3a64304b44e72`  
-**Implementation commit:** `6176e413b2be9880c23cedbdaa899f9752693b22`  
+**Dataset commit:** `ed6c49a4e273bb540a26c46d61c011974d0192f6`  
+**Implementation commit:** `9df9f98cce86c5f2195142b2c02dd9b39dd9dc7c`  
 **Protocol version:** 12.0  
-**Generated:** 2026-11-09 17:05:35 UTC  
-**Result:** 100.00% (40,437/40,437) passed; 0 failed, 0 missing results.
+**Generated:** 2026-11-23 05:21:00 UTC  
+**Result:** 100.00% (46,014/46,014) passed; 0 failed, 0 missing results.
 
 Cells show success percentage (passed/total), including missing results in the total. Valid samples must decode and re-encode to the expected bytes. Invalid samples must be rejected. A dash means no samples.
 
@@ -15,7 +15,7 @@ Cells show success percentage (passed/total), including missing results in the t
 | %constr&lt;plutus\_data&gt; | 100.00% (800/800) | 100.00% (3,097/3,097) |
 | %multiasset&lt;positive\_coin&gt; | 100.00% (100/100) | 100.00% (325/325) |
 | account\_balance\_interval | 100.00% (100/100) | 100.00% (304/304) |
-| account\_balance\_intervals | 100.00% (100/100) | 100.00% (305/305) |
+| account\_balance\_intervals | 100.00% (100/100) | 100.00% (303/303) |
 | addr\_keyhash | 100.00% (100/100) | 100.00% (100/100) |
 | address | 100.00% (100/100) | 100.00% (33/33) |
 | alonzo\_transaction\_output | 100.00% (100/100) | 100.00% (308/308) |
@@ -28,12 +28,15 @@ Cells show success percentage (passed/total), including missing results in the t
 | auxiliary\_scripts | 100.00% (12/12) | 100.00% (392/392) |
 | babbage\_transaction\_output | 100.00% (100/100) | 100.00% (317/317) |
 | big\_int | 100.00% (100/100) | 100.00% (312/312) |
-| block | 100.00% (600/600) | 100.00% (1,824/1,824) |
-| block\_body | 100.00% (100/100) | 100.00% (310/310) |
+| block | 100.00% (600/600) | 100.00% (1,818/1,818) |
+| block\_body | 100.00% (100/100) | 100.00% (307/307) |
 | block\_number | 100.00% (100/100) | 100.00% (106/106) |
+| block\_transaction | 100.00% (100/100) | 100.00% (300/300) |
+| bls\_key | 100.00% (100/100) | — (0/0) |
 | bootstrap\_witness | 100.00% (100/100) | 100.00% (307/307) |
 | bounded\_bytes | 100.00% (100/100) | 100.00% (106/106) |
 | certificate | 100.00% (600/600) | 100.00% (1,921/1,921) |
+| certificates | 100.00% (100/100) | 100.00% (300/300) |
 | coin | 100.00% (100/100) | 100.00% (204/204) |
 | committee\_cold\_credential | 100.00% (100/100) | 100.00% (100/100) |
 | committee\_hot\_credential | 100.00% (100/100) | 100.00% (100/100) |
@@ -42,27 +45,35 @@ Cells show success percentage (passed/total), including missing results in the t
 | credential | 100.00% (100/100) | 100.00% (113/113) |
 | data | 100.00% (100/100) | 100.00% (308/308) |
 | datum\_option | 100.00% (100/100) | 100.00% (313/313) |
+| direct\_deposits | 100.00% (100/100) | 100.00% (300/300) |
 | dns\_name | 100.00% (100/100) | 100.00% (105/105) |
 | drep | 100.00% (100/100) | 100.00% (119/119) |
 | drep\_credential | 100.00% (100/100) | 100.00% (100/100) |
 | drep\_voting\_thresholds | 100.00% (100/100) | 100.00% (15/15) |
-| eb\_announcement | 100.00% (100/100) | 100.00% (207/207) |
+| eb\_reference | 100.00% (100/100) | 100.00% (200/200) |
+| eb\_references | 100.00% (100/100) | 100.00% (300/300) |
+| eb\_references\_announcement | 100.00% (100/100) | 100.00% (207/207) |
 | epoch | 100.00% (100/100) | 100.00% (106/106) |
 | ex\_unit\_prices | 100.00% (100/100) | 100.00% (305/305) |
 | ex\_units | 100.00% (100/100) | 100.00% (16/16) |
 | gov\_action | 100.00% (600/600) | 100.00% (1,852/1,852) |
 | gov\_action\_id | 100.00% (100/100) | 100.00% (207/207) |
 | guardrails\_script\_hash | 100.00% (100/100) | 100.00% (100/100) |
+| guards | 100.00% (100/100) | 100.00% (300/300) |
 | hash28 | 100.00% (100/100) | 100.00% (104/104) |
 | hash32 | 100.00% (100/100) | 100.00% (105/105) |
 | header | 100.00% (100/100) | 100.00% (312/312) |
 | header\_body | 100.00% (100/100) | 100.00% (323/323) |
+| header\_version\_info | 100.00% (100/100) | 100.00% (200/200) |
 | ipv4 | 100.00% (100/100) | 100.00% (104/104) |
 | ipv6 | 100.00% (100/100) | 100.00% (104/104) |
 | kes\_period | 100.00% (100/100) | 100.00% (106/106) |
 | kes\_vkey | 100.00% (100/100) | 100.00% (105/105) |
 | language | 100.00% (4/4) | 100.00% (31/31) |
+| leios\_certificate | 100.00% (100/100) | 100.00% (100/100) |
+| leios\_signature | 100.00% (100/100) | — (0/0) |
 | major\_protocol\_version | 100.00% (14/14) | 100.00% (21/21) |
+| mempool\_transaction | 100.00% (100/100) | 100.00% (306/306) |
 | metadata | 100.00% (100/100) | 100.00% (309/309) |
 | metadatum | 100.00% (100/100) | 100.00% (317/317) |
 | mint | 100.00% (100/100) | 100.00% (319/319) |
@@ -71,30 +82,37 @@ Cells show success percentage (passed/total), including missing results in the t
 | nonnegative\_interval | 100.00% (100/100) | 100.00% (312/312) |
 | nonzero\_int64 | 100.00% (100/100) | 100.00% (12/12) |
 | operational\_cert | 100.00% (100/100) | 100.00% (308/308) |
+| peras\_certificate | 100.00% (100/100) | 100.00% (200/200) |
 | plutus\_data | 100.00% (100/100) | 100.00% (318/318) |
 | plutus\_v1\_script | 100.00% (100/100) | 100.00% (3/3) |
 | plutus\_v2\_script | 100.00% (100/100) | 100.00% (3/3) |
 | plutus\_v3\_script | 100.00% (100/100) | 100.00% (3/3) |
+| plutus\_v4\_script | 100.00% (100/100) | — (0/0) |
 | policy\_id | 100.00% (100/100) | 100.00% (100/100) |
 | pool\_keyhash | 100.00% (100/100) | 100.00% (100/100) |
 | pool\_metadata | 100.00% (100/100) | 100.00% (305/305) |
 | pool\_voting\_thresholds | 100.00% (100/100) | 100.00% (10/10) |
 | positive\_coin | 100.00% (100/100) | 100.00% (8/8) |
 | proposal\_procedure | 100.00% (100/100) | 100.00% (308/308) |
+| proposal\_procedures | 100.00% (100/100) | 100.00% (300/300) |
 | protocol\_param\_update | 100.00% (100/100) | 100.00% (381/381) |
 | protocol\_version | 100.00% (100/100) | 100.00% (207/207) |
 | redeemers | 100.00% (100/100) | 100.00% (351/351) |
 | relay | 100.00% (100/100) | 100.00% (322/322) |
+| required\_top\_level\_guards | 100.00% (100/100) | 100.00% (300/300) |
 | reward\_account | 100.00% (100/100) | 100.00% (3/3) |
 | script | 100.00% (100/100) | 100.00% (331/331) |
 | script\_data\_hash | 100.00% (100/100) | 100.00% (100/100) |
 | script\_hash | 100.00% (100/100) | 100.00% (100/100) |
 | signature | 100.00% (100/100) | 100.00% (105/105) |
 | slot | 100.00% (100/100) | 100.00% (106/106) |
+| slot\_interval | 100.00% (100/100) | 100.00% (100/100) |
 | stake\_credential | 100.00% (100/100) | 100.00% (100/100) |
-| sub\_transaction\_body | 100.00% (100/100) | 100.00% (324/324) |
-| transaction | 100.00% (100/100) | 100.00% (308/308) |
-| transaction\_body | 100.00% (100/100) | 100.00% (345/345) |
+| starting\_account\_balance\_intervals | 100.00% (100/100) | 100.00% (300/300) |
+| sub\_transaction | 100.00% (100/100) | 100.00% (300/300) |
+| sub\_transaction\_body | 100.00% (100/100) | 100.00% (320/320) |
+| sub\_transactions | 100.00% (100/100) | 100.00% (300/300) |
+| transaction\_body | 100.00% (100/100) | 100.00% (339/339) |
 | transaction\_id | 100.00% (100/100) | 100.00% (100/100) |
 | transaction\_input | 100.00% (100/100) | 100.00% (207/207) |
 | transaction\_output | 100.00% (100/100) | 100.00% (302/302) |
@@ -111,4 +129,4 @@ Cells show success percentage (passed/total), including missing results in the t
 | vrf\_keyhash | 100.00% (100/100) | 100.00% (100/100) |
 | vrf\_vkey | 100.00% (100/100) | 100.00% (105/105) |
 | withdrawals | 100.00% (100/100) | 100.00% (311/311) |
-| **Total** | **100.00% (12,135/12,135)** | **100.00% (28,302/28,302)** |
+| **Total** | **100.00% (13,935/13,935)** | **100.00% (32,079/32,079)** |
