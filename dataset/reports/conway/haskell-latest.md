@@ -1,12 +1,12 @@
 # Cardano CBOR Decoder/Encoder Conformance Report
 
-**Corpus:** dataset / conway  
+**Corpus:** output / conway  
 **Era:** conway  
-**Dataset commit:** `7543411152a41b98053eb32fdad3a64304b44e72`  
-**Implementation commit:** `6176e413b2be9880c23cedbdaa899f9752693b22`  
+**Dataset commit:** `d9002a0e721897e5f4c12c70a0a99237a22c7d4f`  
+**Implementation commit:** `9df9f98cce86c5f2195142b2c02dd9b39dd9dc7c`  
 **Protocol version:** 11.0  
-**Generated:** 2026-11-09 17:05:14 UTC  
-**Result:** 100.00% (43,434/43,434) passed; 0 failed, 0 missing results.
+**Generated:** 2026-11-23 16:27:48 UTC  
+**Result:** 100.00% (43,438/43,438) passed; 0 failed, 0 missing results.
 
 Cells show success percentage (passed/total), including missing results in the total. Valid samples must decode and re-encode to the expected bytes. Invalid samples must be rejected. A dash means no samples.
 
@@ -53,7 +53,7 @@ Cells show success percentage (passed/total), including missing results in the t
 | hash28 | 100.00% (100/100) | 100.00% (159/159) |
 | hash32 | 100.00% (100/100) | 100.00% (157/157) |
 | header | 100.00% (100/100) | 100.00% (410/410) |
-| header\_body | 100.00% (100/100) | 100.00% (420/420) |
+| header\_body | 100.00% (100/100) | 100.00% (424/424) |
 | ipv4 | 100.00% (100/100) | 100.00% (144/144) |
 | ipv6 | 100.00% (100/100) | 100.00% (158/158) |
 | kes\_period | 100.00% (100/100) | 100.00% (106/106) |
@@ -109,4 +109,4 @@ Cells show success percentage (passed/total), including missing results in the t
 | vrf\_keyhash | 100.00% (100/100) | 100.00% (150/150) |
 | vrf\_vkey | 100.00% (100/100) | 100.00% (159/159) |
 | withdrawals | 100.00% (100/100) | 100.00% (311/311) |
-| **Total** | **100.00% (10,681/10,681)** | **100.00% (32,753/32,753)** |
+| **Total** | **100.00% (10,681/10,681)** | **100.00% (32,757/32,757)** |

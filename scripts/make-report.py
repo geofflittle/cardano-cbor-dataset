@@ -13,7 +13,7 @@ INPUT_SUFFIX = ".input.cbor"
 REPORT_VERSION = "2"
 COMMIT = re.compile(r"[0-9a-f]{40}")
 # The report does not name its era: the protocol version tells it. The major version is the one that the node decodes with.
-ERAS = {"11": "conway", "12": "dijkstra"}
+ERAS = {"6": "alonzo", "8": "babbage", "11": "conway", "12": "dijkstra"}
 
 @dataclass
 class Counts:
